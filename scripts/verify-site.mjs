@@ -102,6 +102,9 @@ assert(
 );
 assert(homepage.includes('data-motion-mode="adaptive"'), '/: missing reduced-motion marker');
 assert(homepage.includes('data-system-field'), '/: missing system field');
+assert(homepage.includes('data-command-hero'), '/: missing command hero surface');
+assert(homepage.includes('data-hero-console'), '/: missing live hero console');
+assert(homepage.includes('SYSTEM / LIVE'), '/: missing live system status');
 assert(homepage.includes('data-webgl-fallback'), '/: missing WebGL fallback marker');
 assert(homepage.includes('data-static-first="true"'), '/: missing static-first hero marker');
 assert(!homepage.includes('<canvas'), '/: homepage requires canvas-only content');
@@ -123,6 +126,8 @@ for (const marker of [
 ]) {
   assert(homepage.includes(marker), `/: missing ${marker}`);
 }
+assert(homepage.includes('data-system-brief'), '/: missing system brief surface');
+assert(homepage.includes('data-principles-console'), '/: missing principles console');
 
 const assetNames = existsSync(join(dist, 'assets')) ? readdirSync(join(dist, 'assets')) : [];
 for (const chunk of ['three', 'gsap', 'motion', 'router', 'react']) {

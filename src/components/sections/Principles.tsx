@@ -7,6 +7,7 @@
  * capability. This is the honest substitute for social proof, and it reads
  * better than invented numbers would.
  */
+import { useState } from 'react';
 import { partners, principles } from '../../data/company';
 import { external, routes } from '../../data/site';
 import { formatInsightDate, selectInsights } from '../../data/insights';
@@ -19,42 +20,64 @@ import { Body, Eyebrow, Note, Title } from '../ui/Typography';
 /* ------------------------------------------------------------------ */
 
 export function Principles() {
-  return (
-    <Section id="principles" labelledBy="principles-title" dataMarkers={['principles']}>
-      <Shell>
-        <Grid rails>
-          <div className="col-span-4 md:col-span-8 lg:col-span-4">
-            <Reveal>
-              <Eyebrow index="07">Why Axleta</Eyebrow>
-              <Title id="principles-title" className="mt-7">
-                What we hold to.
-              </Title>
-              <Body className="mt-7">
-                Every principle below is a description of something Axleta actually
-                publishes it can do — not an aspiration and not a claim about
-                results we cannot evidence.
-              </Body>
-            </Reveal>
-          </div>
+  const [activeIndex, setActiveIndex] = useState(0);
+  const active = principles[activeIndex] ?? principles[0];
 
-          <div className="col-span-4 mt-12 md:col-span-8 lg:col-span-8 lg:mt-0">
-            <ol className="grid gap-x-8 gap-y-9 sm:grid-cols-2">
-              {principles.map((principle, i) => (
-                <Reveal as="li" key={principle.index} index={i} rule>
-                  <div className="pt-7">
-                    <span className="label text-accent-700 tabular-nums">{principle.index}</span>
-                    <h3 className="mt-4 font-display text-xl leading-snug tracking-tightest">
-                      {principle.label}
-                    </h3>
-                    <p className="mt-3 text-sm leading-relaxed text-neutral-700">
-                      {principle.detail}
-                    </p>
-                  </div>
-                </Reveal>
+  return (
+    <Section
+      id="principles"
+      labelledBy="principles-title"
+      tone="ink"
+      dataMarkers={['principles', 'principles-console']}
+    >
+      <Shell>
+        <div className="principles-console">
+          <Reveal>
+            <Eyebrow index="07" tone="ink">Why Axleta</Eyebrow>
+            <Title id="principles-title" tone="ink" className="mt-7">
+              What we hold to.
+            </Title>
+            <Body tone="ink" className="mt-7 max-w-xl">
+              Every principle below is a description of something Axleta actually
+              publishes it can do. Select one to inspect the thinking behind it.
+            </Body>
+          </Reveal>
+
+          <div className="principles-console__layout">
+            <ol className="principles-console__list" aria-label="Axleta principles">
+              {principles.map((principle, index) => (
+                <li key={principle.index}>
+                  <button
+                    type="button"
+                    className={`principles-console__item${index === activeIndex ? ' is-active' : ''}`}
+                    aria-pressed={index === activeIndex}
+                    onClick={() => setActiveIndex(index)}
+                  >
+                    <span className="label">{principle.index}</span>
+                    <span>{principle.label}</span>
+                    <span className="principles-console__item-arrow" aria-hidden="true">+</span>
+                  </button>
+                </li>
               ))}
             </ol>
+
+            <div className="principles-console__readout" aria-live="polite">
+              <div className="principles-console__readout-top">
+                <span className="label text-accent-300">Principle / {active.index}</span>
+                <span className="label text-neutral-500">Operating rule</span>
+              </div>
+              <div className="principles-console__diagram" aria-hidden="true">
+                <span className="principles-console__diagram-line principles-console__diagram-line--one" />
+                <span className="principles-console__diagram-line principles-console__diagram-line--two" />
+                <span className="principles-console__diagram-node principles-console__diagram-node--one" />
+                <span className="principles-console__diagram-node principles-console__diagram-node--two" />
+                <span className="principles-console__diagram-node principles-console__diagram-node--three" />
+              </div>
+              <h3 className="principles-console__readout-title">{active.label}</h3>
+              <p className="mt-5 max-w-lg text-lg leading-relaxed text-neutral-300">{active.detail}</p>
+            </div>
           </div>
-        </Grid>
+        </div>
       </Shell>
     </Section>
   );

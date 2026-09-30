@@ -1,28 +1,19 @@
 /**
- * Hero.
- *
- * Ink ground, oversized Archivo display setting, and the Axleta axis on the
- * right. The axis is drawn as SVG and always present — `HeroScene` layers a
- * WebGL version on top only when the motion policy allows it, and fades the SVG
- * out when the canvas has taken over.
- *
- * The headline is a single assertive statement, not a slogan with a subtitle.
- * Copy is taken from the verified positioning: the systems behind the business,
- * designed and kept running.
+ * The homepage entry point: an operating view of the system, not a brochure
+ * cover. The static console is the first meaningful paint; WebGL is optional
+ * atmosphere layered behind it on capable desktop devices.
  */
 import { motion } from 'motion/react';
-import { Link } from 'react-router-dom';
 import { company } from '../../data/company';
 import { contact, routes } from '../../data/site';
-import { solutions } from '../../data/solutions';
 import { heroTimeline, duration, ease } from '../../lib/motion';
 import { track } from '../../lib/analytics';
-import { AxletaAxis } from '../diagrams/AxletaAxis';
 import { usePrefersReducedMotion } from '../../hooks/useMotionMode';
 import { LazyHeroScene } from '../three/LazyHeroScene';
 import { ArrowLink, CtaPair } from '../ui/Button';
 import { Shell } from '../ui/Layout';
-import { ArchitecturalLabel, Eyebrow, Lead } from '../ui/Typography';
+import { Eyebrow, Lead } from '../ui/Typography';
+import { HeroConsoleIndex, HeroSystemConsole } from './HeroSystemConsole';
 
 export function Hero() {
   const reduced = usePrefersReducedMotion();
@@ -41,44 +32,40 @@ export function Hero() {
     <section
       data-surface="ink"
       data-system-field
+      data-command-hero
       data-static-first="true"
       data-motion-mode="adaptive"
       aria-labelledby="hero-title"
-      className="surface-ink relative isolate flex min-h-[92svh] items-end overflow-hidden pb-section-y-tight pt-32 lg:min-h-dvh"
+      className="command-hero surface-ink relative isolate overflow-hidden pb-10 pt-32 lg:min-h-dvh lg:pb-12"
     >
-      {/* Ground texture: the coordinate rail, faint, as a drafting guide */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-[0.06]"
-        style={{
-          backgroundImage:
-            'linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)',
-          backgroundSize: 'calc(100% / 12) 100%, 100% 12rem',
-        }}
-      />
+      <div aria-hidden="true" className="command-hero__grid" />
+      <div aria-hidden="true" className="command-hero__scanline" />
 
-      {/* The axis, right side, plus its WebGL counterpart */}
       <div
         aria-hidden="true"
         data-webgl-fallback
-        className="pointer-events-none absolute -right-[18%] top-1/2 aspect-square w-[130%] max-w-none -translate-y-1/2 opacity-70 sm:right-[-8%] sm:w-[78%] lg:right-[-2%] lg:w-[46%] lg:opacity-100"
+        className="pointer-events-none absolute inset-y-0 right-0 z-0 w-full opacity-30 lg:w-[54%] lg:opacity-55"
       >
-        <AxletaAxis className="absolute inset-0" animate={false} />
         <LazyHeroScene className="absolute inset-0" />
       </div>
 
       <Shell className="relative z-10 w-full">
-        <div className="grid grid-cols-4 gap-x-6 gap-y-12 md:grid-cols-8 lg:grid-cols-12">
-          <div className="col-span-4 md:col-span-8 lg:col-span-8">
-            <motion.div {...rise(heroTimeline.eyebrowAt)}>
-              <Eyebrow index="01" tone="ink" live>
-                Technology and advancement · est. {company.founded}
-              </Eyebrow>
-            </motion.div>
+        <div className="command-hero__meta">
+          <motion.div {...rise(heroTimeline.eyebrowAt)}>
+            <Eyebrow index="01" tone="ink" live>
+              Technology and advancement / est. {company.founded}
+            </Eyebrow>
+          </motion.div>
+          <motion.p {...rise(heroTimeline.eyebrowAt + 0.08)} className="label text-neutral-500">
+            Operating architecture for SMEs
+          </motion.p>
+        </div>
 
+        <div className="command-hero__layout">
+          <div className="command-hero__copy">
             <motion.h1
               id="hero-title"
-              className="mt-8 max-w-[16ch] text-hero font-display font-medium leading-[0.92] tracking-tightest"
+              className="command-hero__title"
               initial={reduced ? { opacity: 1 } : { opacity: 0, y: 34 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{
@@ -88,23 +75,20 @@ export function Hero() {
               }}
             >
               <span className="block">The systems</span>
-              <span className="block text-accent-300">behind the business,</span>
-              <span className="block">designed and kept running.</span>
+              <span className="block text-accent-300">behind the business.</span>
+              <span className="command-hero__title-line">Designed. Connected. Kept running.</span>
             </motion.h1>
 
-            <motion.div {...rise(heroTimeline.ledeAt)} className="mt-10">
-              <ArchitecturalLabel tone="ink">
-                ERP · APPLICATIONS · INFRASTRUCTURE · AUTOMATION
-              </ArchitecturalLabel>
-              <Lead tone="ink" className="mt-6 max-w-2xl text-neutral-300">
-                Axleta supplies technology-driven systems and solutions for SMEs — SAP Business
-                One and S/4HANA Public Cloud, the companion applications that extend them, the
-                infrastructure they run on, and the automation that removes the re-keying.
-                Chosen for fitness of purpose, and supported afterwards.
+            <motion.div {...rise(heroTimeline.ledeAt)} className="command-hero__lede">
+              <p className="label text-accent-300">ERP / APPLICATIONS / INFRASTRUCTURE / AUTOMATION</p>
+              <Lead tone="ink" className="mt-6 max-w-xl text-neutral-300">
+                Axleta connects the systems that keep an SME moving: SAP Business One and
+                S/4HANA Public Cloud, the applications around them, the infrastructure below
+                them, and the automation between them.
               </Lead>
             </motion.div>
 
-            <motion.div {...rise(heroTimeline.actionsAt)} className="mt-11">
+            <motion.div {...rise(heroTimeline.actionsAt)} className="mt-10">
               <CtaPair
                 tone="ink"
                 primary={{
@@ -114,58 +98,38 @@ export function Hero() {
                 }}
                 secondary={{
                   to: routes.solutions,
-                  label: 'See the solutions',
+                  label: 'Explore the system',
                   onClick: () => track('cta_click', { label: 'hero_solutions' }),
                 }}
               />
             </motion.div>
 
-            <motion.div
-              {...rise(heroTimeline.actionsAt + 0.12)}
-              className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-3"
-            >
-              <span className="label text-neutral-500">Or reach us directly</span>
+            <motion.div {...rise(heroTimeline.actionsAt + 0.12)} className="command-hero__contact">
+              <span className="label text-neutral-500">Direct line</span>
               <a
                 href={`mailto:${contact.email}`}
                 className="label text-paper underline-offset-4 hover:text-accent-300 hover:underline"
               >
                 {contact.email}
               </a>
-              <span aria-hidden="true" className="h-px w-6 bg-white/20" />
-              <span className="label text-neutral-500">
-                Supporting {contact.coverage}
-              </span>
+              <span className="command-hero__contact-rule" aria-hidden="true" />
+              <span className="label text-neutral-500">{contact.coverage}</span>
             </motion.div>
           </div>
 
-          {/* Hero footnote: the four areas, listed, not cards */}
-          <motion.aside
-            {...rise(0.95)}
-            className="col-span-4 md:col-span-8 lg:col-span-3 lg:col-start-10 lg:self-end"
-          >
-            <p className="label text-neutral-500">Four areas of practice</p>
-            <ol className="mt-5 space-y-3">
-              {solutions.map((solution) => (
-                <li key={solution.id}>
-                  <Link
-                    to={`${routes.solutions}#${solution.anchor}`}
-                    className="group flex items-baseline gap-4 border-l border-white/15 py-1.5 pl-4 transition-colors duration-300 hover:border-accent-300"
-                  >
-                    <span className="label w-6 shrink-0 text-accent-300 tabular-nums">
-                      {solution.number}
-                    </span>
-                    <span className="font-display text-lg tracking-tightest text-paper transition-colors duration-300 group-hover:text-accent-300">
-                      {solution.title}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ol>
-            <ArrowLink to={routes.about} tone="ink" className="mt-7">
-              Why Axleta
-            </ArrowLink>
-          </motion.aside>
+          <motion.div {...rise(0.72)} className="command-hero__visual">
+            <HeroSystemConsole />
+            <HeroConsoleIndex />
+          </motion.div>
         </div>
+
+        <motion.div {...rise(1.05)} className="command-hero__footer">
+          <ArrowLink to={routes.about} tone="ink">
+            Why Axleta
+          </ArrowLink>
+          <span className="label text-neutral-500">The business system, treated as a system</span>
+          <span className="label text-accent-300">Scroll to inspect / 01</span>
+        </motion.div>
       </Shell>
     </section>
   );

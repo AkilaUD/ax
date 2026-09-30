@@ -29,7 +29,7 @@ import { useScrolled } from '../../hooks/useScrollState';
 import { usePrefersReducedMotion } from '../../hooks/useMotionMode';
 import { ArrowLink, ButtonLink } from '../ui/Button';
 import { Shell } from '../ui/Layout';
-import { Wordmark } from '../ui/Chrome';
+import { StatusDot, Wordmark } from '../ui/Chrome';
 
 export function SiteHeader() {
   const location = useLocation();
@@ -46,6 +46,7 @@ export function SiteHeader() {
   const closeTimer = useRef(0);
 
   const isHome = location.pathname === routes.home;
+  const onInk = isHome && !scrolled;
 
   // Close every menu on navigation.
   //
@@ -100,7 +101,7 @@ export function SiteHeader() {
         'duration-500 ease-[var(--ease-standard)]',
         headerSolid
           ? 'border-b border-border bg-surface/92 backdrop-blur-md'
-          : 'border-b border-transparent bg-transparent',
+          : 'border-b border-transparent bg-transparent text-paper',
       )}
     >
       <a href="#main" className="skip-link">
@@ -137,7 +138,11 @@ export function SiteHeader() {
                     onFocus={() => openNow(group.label)}
                     className={cn(
                       'label relative flex h-18 items-center gap-2 px-4 transition-colors duration-300',
-                      isOpen ? 'text-accent-700' : 'text-ink hover:text-accent-700',
+                      isOpen
+                        ? 'text-accent-300'
+                        : onInk
+                          ? 'text-paper hover:text-accent-300'
+                          : 'text-ink hover:text-accent-700',
                     )}
                   >
                     {group.label}
@@ -158,9 +163,16 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden items-center gap-5 lg:flex">
+          <span className={cn('label inline-flex items-center gap-2', onInk ? 'text-neutral-300' : 'text-neutral-700')}>
+            <StatusDot tone={onInk ? 'ink' : 'paper'} />
+            Systems / active
+          </span>
           <a
             href={`mailto:${contact.email}`}
-            className="label text-neutral-700 transition-colors duration-300 hover:text-accent-700"
+            className={cn(
+              'label transition-colors duration-300',
+              onInk ? 'text-neutral-300 hover:text-accent-300' : 'text-neutral-700 hover:text-accent-700',
+            )}
           >
             {contact.email}
           </a>
@@ -176,7 +188,12 @@ export function SiteHeader() {
         {/* ---------- Mobile trigger ---------- */}
         <button
           type="button"
-          className="label flex h-11 items-center gap-3 border border-line-strong px-4 lg:hidden"
+          className={cn(
+            'label flex h-11 items-center gap-3 border px-4 lg:hidden',
+            onInk
+              ? 'border-white/25 text-paper hover:border-accent-300 hover:text-accent-300'
+              : 'border-line-strong text-ink',
+          )}
           aria-expanded={drawerOpen}
           aria-controls={drawerId}
           onClick={() => setDrawerOpen((v) => !v)}
