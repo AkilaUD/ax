@@ -69,7 +69,7 @@ export function Premise() {
           {/* The system index */}
           <div className="col-span-4 mt-14 md:col-span-8 lg:col-span-5 lg:col-start-8 lg:mt-0">
             <Reveal>
-              <p className="label text-neutral-500">Index of practice</p>
+              <p className="label text-neutral-700">Index of practice</p>
             </Reveal>
             <ol className="mt-6">
               {solutions.map((solution, i) => (

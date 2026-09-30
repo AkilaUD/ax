@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { extendTailwindMerge } from "tailwind-merge";
 import { jsx, jsxs } from "react/jsx-runtime";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -266,6 +266,22 @@ var footerNav = [
 ];
 //#endregion
 //#region src/lib/utils.ts
+/**
+* The scale registers custom font sizes (`--text-micro`, `--text-eyebrow`, …).
+* tailwind-merge does not know them and classifies an unknown `text-*` class as
+* a *colour*, so `text-paper` + `text-micro` would collapse to the last one and
+* silently strip button colours. Teach it about the project's sizes first.
+*/
+var twMerge = extendTailwindMerge({ extend: { classGroups: { "font-size": [{ text: [
+	"micro",
+	"eyebrow",
+	"body",
+	"lead",
+	"stat",
+	"title",
+	"hero",
+	"display"
+] }] } } });
 /** Tailwind-aware class merge. */
 function cn(...inputs) {
 	return twMerge(clsx(inputs));

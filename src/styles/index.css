@@ -187,15 +187,42 @@
     text-wrap: pretty;
   }
 
-  /* Never hide the real cursor; this only ever adds a ring. */
-  :focus-visible {
-    outline: 2px solid var(--color-accent-600);
+  /* Never hide the real cursor; this only ever adds a ring.
+     Chrome resolves `outline-color` to currentColor on links that carry their
+     own text colour (verified: a literal #0065c3 declaration computes back as
+     the element's text colour), which produced invisible paper-on-paper and
+     ink-on-ink rings. The visible ring is therefore painted with box-shadow,
+     which resolves custom properties correctly, and each ring gets a halo in
+     the surface colour so it separates from a same-coloured control fill.
+     The outline is retained only for forced-colors mode. */
+  :focus-visible,
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  summary:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 2px solid transparent;
     outline-offset: 3px;
     border-radius: 2px;
+    box-shadow:
+      0 0 0 2px #0065c3,
+      0 0 0 5px var(--color-paper);
   }
 
-  [data-surface='ink'] :focus-visible {
-    outline-color: var(--color-accent-300);
+  [data-surface='ink'] :focus-visible,
+  [data-surface='ink'] a:focus-visible,
+  [data-surface='ink'] button:focus-visible,
+  [data-surface='ink'] input:focus-visible,
+  [data-surface='ink'] select:focus-visible,
+  [data-surface='ink'] textarea:focus-visible,
+  [data-surface='ink'] summary:focus-visible,
+  [data-surface='ink'] [tabindex]:focus-visible {
+    outline-color: transparent;
+    box-shadow:
+      0 0 0 2px #3fa2ff,
+      0 0 0 5px var(--color-ink);
   }
 
   ::selection {
@@ -301,11 +328,82 @@
 .surface-ink .muted:hover {
   color: var(--color-paper);
 }
-.surface-ink :focus-visible {
-  outline-color: var(--color-accent-300);
+.surface-ink :focus-visible,
+.surface-ink a:focus-visible,
+.surface-ink button:focus-visible,
+.surface-ink input:focus-visible,
+.surface-ink select:focus-visible,
+.surface-ink textarea:focus-visible,
+.surface-ink summary:focus-visible,
+.surface-ink [tabindex]:focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: 3px;
+  box-shadow:
+    0 0 0 2px #3fa2ff,
+    0 0 0 5px var(--color-ink);
+}
+
+/* Forced-colors / Windows High Contrast drops box-shadow, so the ring falls
+   back to a system outline. Unlayered so it wins over the rules above. */
+@media (forced-colors: active) {
+  :focus-visible,
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  summary:focus-visible,
+  [tabindex]:focus-visible,
+  .surface-ink :focus-visible,
+  [data-surface='ink'] :focus-visible {
+    outline: 2px solid CanvasText;
+    box-shadow: none;
+  }
 }
 .surface-ink .rule-t {
   border-top-color: rgb(255 255 255 / 0.14);
+}
+
+/* ---------- Coordinate rail (fixed overlay, so it needs its own surface) -----
+   The rail floats over every section and the ink footer, and is never a
+   descendant of any of them, so the scroll pass stamps `data-surface` on each
+   marker from a hit-test at that marker's own centre. Neutral-700 ordinals are
+   6.6:1 on paper but only 2.6:1 on ink, so the ink palette is applied explicitly
+   here. Contrast: neutral-300 #a9a79f on ink #111111 = 7.9:1, accent-300 tick
+   on ink = 7.1:1, neutral-700 tick on surface-sunken = 4.5:1.
+   Unlayered so these beat the `text-*`/`border-*` utilities. */
+.rail-marker[data-surface='ink'] .rail-ordinal,
+.rail-marker[data-surface='ink'] .rail-label {
+  color: var(--color-neutral-300);
+}
+.rail-marker[data-surface='ink'] .rail-label[data-active='true'] {
+  color: var(--color-paper);
+}
+.rail-marker[data-surface='ink'] .rail-tick {
+  border-top-color: rgb(255 255 255 / 0.45);
+}
+.rail-marker[data-surface='ink'] .rail-dot {
+  background-color: var(--color-accent-300);
+}
+.rail-marker[data-surface='ink']:hover .rail-tick,
+.rail-marker[data-surface='ink']:focus-visible .rail-tick {
+  border-top-color: var(--color-accent-300);
+}
+
+/* A rail marker carries its own `data-surface`, so it is never a descendant of
+   an ink section and needs the ink focus ring explicitly. */
+.rail-marker[data-surface='ink']:focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: 3px;
+  box-shadow:
+    0 0 0 2px #3fa2ff,
+    0 0 0 5px var(--color-ink);
+}
+
+/* The inline section index sits in normal flow, so it inherits its section's
+   surface from the ancestor `data-surface`. */
+[data-surface='ink'] .section-index-ordinal {
+  color: var(--color-accent-300);
 }
 
 /* ---------- Keyframes (decorative only; all honour reduced motion) ---------- */

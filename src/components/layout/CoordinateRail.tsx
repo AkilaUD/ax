@@ -19,11 +19,46 @@ import { usePrefersReducedMotion } from '../../hooks/useMotionMode';
 
 export type RailItem = { id: string; label: string };
 
+type Surface = 'paper' | 'ink';
+
+const INK_SELECTOR = '.surface-ink, [data-surface="ink"]';
+
+/**
+ * Hit-test a single point and report the surface of the topmost painted element
+ * there.
+ *
+ * The rail is a fixed overlay, so it is never a descendant of whatever it floats
+ * over — including the footer, which is ink on every page. Inferring the surface
+ * from the section list gets that wrong, and so does inferring one surface for
+ * the whole rail: the rail is ~156px tall and can straddle a section boundary,
+ * so markers at either end legitimately sit on different surfaces. Each marker
+ * is therefore resolved at its own centre point.
+ */
+function surfaceAt(x: number, y: number): Surface {
+  if (y < 0 || y > window.innerHeight || x < 0 || x > window.innerWidth) return 'paper';
+  for (const node of document.elementsFromPoint(x, y)) {
+    const style = getComputedStyle(node);
+    const channels = style.backgroundColor.match(/rgba?\(([^)]+)\)/)?.[1]?.split(',').map((v) => parseFloat(v)) ?? [];
+    const alpha = channels.length === 4 ? channels[3] : channels.length === 3 ? 1 : 0;
+    const painted = (style.backgroundImage && style.backgroundImage !== 'none') || alpha >= 0.95;
+    if (!painted) continue;
+    return node.matches(INK_SELECTOR) ? 'ink' : 'paper';
+  }
+  return 'paper';
+}
+
+/** Hit-testing costs a style recalc per marker, so only redo it on real movement. */
+const SURFACE_REFRESH_PX = 24;
+
 export function CoordinateRail({ items }: { items: RailItem[] }) {
   const [active, setActive] = useState(items[0]?.id ?? '');
   const [visible, setVisible] = useState(false);
+  // Per marker, so ordinals and ticks stay at AA on ink (neutral-300 = 7.9:1)
+  // as well as on paper (neutral-700 = 6.6:1) and on surface-sunken (6.2:1).
+  const [surfaces, setSurfaces] = useState<Record<string, Surface>>({});
   const reduced = usePrefersReducedMotion();
   const railRef = useRef<HTMLDivElement>(null);
+  const lastSurfaceY = useRef(Number.NEGATIVE_INFINITY);
 
   // Only show once the user has committed to reading.
   useEffect(() => {
@@ -71,6 +106,16 @@ export function CoordinateRail({ items }: { items: RailItem[] }) {
       }
 
       setActive(current);
+
+      if (Math.abs(window.scrollY - lastSurfaceY.current) < SURFACE_REFRESH_PX) return;
+      lastSurfaceY.current = window.scrollY;
+      const next: Record<string, Surface> = {};
+      for (const item of items) {
+        const marker = railRef.current?.querySelector<HTMLElement>(`[data-rail-id="${item.id}"]`);
+        const rect = marker?.getBoundingClientRect();
+        next[item.id] = rect ? surfaceAt(rect.left + rect.width / 2, rect.top + rect.height / 2) : 'paper';
+      }
+      setSurfaces(next);
     };
 
     const onScroll = () => {
@@ -95,7 +140,7 @@ export function CoordinateRail({ items }: { items: RailItem[] }) {
       ref={railRef}
       aria-hidden={false}
       className={cn(
-        'pointer-events-none fixed left-0 top-1/2 z-30 hidden -translate-y-1/2 rail:block',
+        'coordinate-rail pointer-events-none fixed left-0 top-1/2 z-30 hidden -translate-y-1/2 rail:block',
         'transition-opacity duration-500 ease-[var(--ease-standard)]',
         visible ? 'opacity-100' : 'opacity-0',
       )}
@@ -108,32 +153,38 @@ export function CoordinateRail({ items }: { items: RailItem[] }) {
               <li key={item.id}>
                 <a
                   href={`#${item.id}`}
-                  className="group flex items-center gap-3 py-1.5"
+                  data-rail-id={item.id}
+                  data-surface={surfaces[item.id] ?? 'paper'}
+                  className="rail-marker group flex items-center gap-3 py-1.5"
                   aria-current={isActive ? 'true' : undefined}
                 >
-                  <span className="label w-5 shrink-0 text-right text-neutral-700 tabular-nums transition-colors duration-300 group-hover:text-ink">
+                  <span className="rail-ordinal label w-5 shrink-0 text-right text-neutral-700 tabular-nums transition-colors duration-300 group-hover:text-ink">
                     {String(i + 1).padStart(2, '0')}
                   </span>
                   <span className="relative block h-6 w-3">
                     <span
                       aria-hidden="true"
                       className={cn(
-                        'absolute left-0 top-1/2 block w-3 -translate-y-1/2 border-t transition-all duration-500 ease-[var(--ease-line)]',
+                        'rail-tick absolute left-0 top-1/2 block w-3 -translate-y-1/2 border-t transition-all duration-500 ease-[var(--ease-line)]',
+                        // neutral-700 rather than line-strong: the tick is a
+                        // state indicator, so it needs 3:1 on both paper and
+                        // surface-sunken (1.7:1 and 1.5:1 for line-strong).
                         isActive
                           ? 'w-5 border-accent-700'
-                          : 'border-line-strong group-hover:w-5 group-hover:border-accent-600',
+                          : 'border-neutral-700 group-hover:w-5 group-hover:border-accent-600',
                       )}
                     />
                     {isActive && !reduced ? (
                       <span
                         aria-hidden="true"
-                        className="axleta-signal-dot absolute -right-1 top-1/2 h-1 w-1 -translate-y-1/2 rounded-full bg-accent-700"
+                        className="axleta-signal-dot rail-dot absolute -right-1 top-1/2 h-1 w-1 -translate-y-1/2 rounded-full bg-accent-700"
                       />
                     ) : null}
                   </span>
                   <span
+                    data-active={isActive ? 'true' : undefined}
                     className={cn(
-                      'label whitespace-nowrap transition-all duration-300',
+                      'rail-label label whitespace-nowrap transition-all duration-300',
                       isActive
                         ? 'text-ink opacity-100'
                         : 'text-neutral-700 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100',
@@ -169,7 +220,7 @@ export function SectionIndex({ items }: { items: RailItem[] }) {
               href={`#${item.id}`}
               className="label flex items-center gap-2 whitespace-nowrap border-b border-line-strong py-2 text-neutral-700 transition-colors duration-300 hover:border-accent-700 hover:text-accent-700"
             >
-              <span className="text-accent-700 tabular-nums">{String(i + 1).padStart(2, '0')}</span>
+              <span className="section-index-ordinal text-accent-700 tabular-nums">{String(i + 1).padStart(2, '0')}</span>
               {item.label}
             </a>
           </li>

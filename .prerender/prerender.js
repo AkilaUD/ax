@@ -1,4 +1,4 @@
-import { A as organizationJsonLd, C as stagger, D as breadcrumbJsonLd, E as prefersReducedMotion, F as external, I as footerNav, L as primaryNav, M as webSiteJsonLd, N as cn, O as headTagsFor, P as contact, R as routes$1, S as spring, T as usePrefersReducedMotion, _ as Shell, a as Seo, b as ease, c as Display, d as Note, f as Subtitle, g as Section, h as Rule, i as useInView, j as pageMeta, k as metaFor, l as Eyebrow, m as Grid, n as SignalBar, o as ArchitecturalLabel, p as Title, r as SplitHeadline, s as Body, t as Reveal, u as Lead, v as Stack, w as variants$1, x as heroTimeline, y as duration, z as site } from "./assets/Reveal-RE26mpU5.js";
+import { A as organizationJsonLd, C as stagger, D as breadcrumbJsonLd, E as prefersReducedMotion, F as external, I as footerNav, L as primaryNav, M as webSiteJsonLd, N as cn, O as headTagsFor, P as contact, R as routes$1, S as spring, T as usePrefersReducedMotion, _ as Shell, a as Seo, b as ease, c as Display, d as Note, f as Subtitle, g as Section, h as Rule, i as useInView, j as pageMeta, k as metaFor, l as Eyebrow, m as Grid, n as SignalBar, o as ArchitecturalLabel, p as Title, r as SplitHeadline, s as Body, t as Reveal, u as Lead, v as Stack, w as variants$1, x as heroTimeline, y as duration, z as site } from "./assets/Reveal-aoA4BZt0.js";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -313,7 +313,7 @@ var Wordmark = forwardRef(function Wordmark({ className, invert = false, priorit
 function BackToTop() {
 	return /* @__PURE__ */ jsxs("a", {
 		href: "#top",
-		className: "group label inline-flex items-center gap-2 text-neutral-700 transition-colors duration-300 hover:text-ink",
+		className: "group label inline-flex items-center gap-2 text-neutral-300 transition-colors duration-300 hover:text-paper",
 		children: [/* @__PURE__ */ jsx("span", {
 			"aria-hidden": "true",
 			className: "inline-block transition-transform duration-300 ease-[var(--ease-entrance)] group-hover:-translate-y-0.5 motion-reduce:transform-none",
@@ -342,7 +342,7 @@ function Breadcrumbs({ trail, tone = "paper" }) {
 						children: item.name
 					}), /* @__PURE__ */ jsx("span", {
 						"aria-hidden": "true",
-						className: tone === "ink" ? "text-neutral-500" : "text-neutral-300",
+						className: tone === "ink" ? "text-neutral-500" : "text-neutral-700",
 						children: "/"
 					})] })
 				}, item.path);
@@ -1720,7 +1720,7 @@ function Premise() {
 				className: "col-span-4 mt-14 md:col-span-8 lg:col-span-5 lg:col-start-8 lg:mt-0",
 				children: [
 					/* @__PURE__ */ jsx(Reveal, { children: /* @__PURE__ */ jsx("p", {
-						className: "label text-neutral-500",
+						className: "label text-neutral-700",
 						children: "Index of practice"
 					}) }),
 					/* @__PURE__ */ jsx("ol", {
@@ -1769,7 +1769,7 @@ function Premise() {
 					}),
 					/* @__PURE__ */ jsx(Rule, { className: "mt-10" }),
 					/* @__PURE__ */ jsx("p", {
-						className: "label mt-6 text-neutral-500",
+						className: "label mt-6 text-neutral-700",
 						children: "Every capability above is published by Axleta. Nothing here is aspirational."
 					})
 				]
@@ -3363,7 +3363,7 @@ function InsightsFeature() {
 					className: "group block border-t-2 border-ink pt-7",
 					children: [
 						/* @__PURE__ */ jsxs("p", {
-							className: "label flex flex-wrap items-center gap-x-4 gap-y-2 text-neutral-500",
+							className: "label flex flex-wrap items-center gap-x-4 gap-y-2 text-neutral-700",
 							children: [
 								/* @__PURE__ */ jsx("span", {
 									className: "text-accent-700",
@@ -3407,7 +3407,7 @@ function InsightsFeature() {
 							className: "group block pt-7",
 							children: [
 								/* @__PURE__ */ jsxs("p", {
-									className: "label flex flex-wrap items-center gap-x-3 text-neutral-500",
+									className: "label flex flex-wrap items-center gap-x-3 text-neutral-700",
 									children: [/* @__PURE__ */ jsx("span", {
 										className: "text-accent-700",
 										children: article.category
@@ -3523,11 +3523,38 @@ function PageShell({ children }) {
 *  - Hidden below 78rem and under reduced motion, where the per-marker pulse
 *    would be decoration with no benefit.
 */
+var INK_SELECTOR = ".surface-ink, [data-surface=\"ink\"]";
+/**
+* Hit-test a single point and report the surface of the topmost painted element
+* there.
+*
+* The rail is a fixed overlay, so it is never a descendant of whatever it floats
+* over — including the footer, which is ink on every page. Inferring the surface
+* from the section list gets that wrong, and so does inferring one surface for
+* the whole rail: the rail is ~156px tall and can straddle a section boundary,
+* so markers at either end legitimately sit on different surfaces. Each marker
+* is therefore resolved at its own centre point.
+*/
+function surfaceAt(x, y) {
+	if (y < 0 || y > window.innerHeight || x < 0 || x > window.innerWidth) return "paper";
+	for (const node of document.elementsFromPoint(x, y)) {
+		const style = getComputedStyle(node);
+		const channels = style.backgroundColor.match(/rgba?\(([^)]+)\)/)?.[1]?.split(",").map((v) => parseFloat(v)) ?? [];
+		const alpha = channels.length === 4 ? channels[3] : channels.length === 3 ? 1 : 0;
+		if (!(style.backgroundImage && style.backgroundImage !== "none" || alpha >= .95)) continue;
+		return node.matches(INK_SELECTOR) ? "ink" : "paper";
+	}
+	return "paper";
+}
+/** Hit-testing costs a style recalc per marker, so only redo it on real movement. */
+var SURFACE_REFRESH_PX = 24;
 function CoordinateRail({ items }) {
 	const [active, setActive] = useState(items[0]?.id ?? "");
 	const [visible, setVisible] = useState(false);
+	const [surfaces, setSurfaces] = useState({});
 	const reduced = usePrefersReducedMotion();
 	const railRef = useRef(null);
+	const lastSurfaceY = useRef(Number.NEGATIVE_INFINITY);
 	useEffect(() => {
 		const read = () => setVisible(window.scrollY > window.innerHeight * .6);
 		read();
@@ -3565,6 +3592,14 @@ function CoordinateRail({ items }) {
 				}
 			}
 			setActive(current);
+			if (Math.abs(window.scrollY - lastSurfaceY.current) < SURFACE_REFRESH_PX) return;
+			lastSurfaceY.current = window.scrollY;
+			const next = {};
+			for (const item of items) {
+				const rect = (railRef.current?.querySelector(`[data-rail-id="${item.id}"]`))?.getBoundingClientRect();
+				next[item.id] = rect ? surfaceAt(rect.left + rect.width / 2, rect.top + rect.height / 2) : "paper";
+			}
+			setSurfaces(next);
 		};
 		const onScroll = () => {
 			if (frame) return;
@@ -3583,7 +3618,7 @@ function CoordinateRail({ items }) {
 	return /* @__PURE__ */ jsx("div", {
 		ref: railRef,
 		"aria-hidden": false,
-		className: cn("pointer-events-none fixed left-0 top-1/2 z-30 hidden -translate-y-1/2 rail:block", "transition-opacity duration-500 ease-[var(--ease-standard)]", visible ? "opacity-100" : "opacity-0"),
+		className: cn("coordinate-rail pointer-events-none fixed left-0 top-1/2 z-30 hidden -translate-y-1/2 rail:block", "transition-opacity duration-500 ease-[var(--ease-standard)]", visible ? "opacity-100" : "opacity-0"),
 		children: /* @__PURE__ */ jsx("nav", {
 			"aria-label": "On this page",
 			className: "pointer-events-auto px-6",
@@ -3593,25 +3628,28 @@ function CoordinateRail({ items }) {
 					const isActive = active === item.id;
 					return /* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsxs("a", {
 						href: `#${item.id}`,
-						className: "group flex items-center gap-3 py-1.5",
+						"data-rail-id": item.id,
+						"data-surface": surfaces[item.id] ?? "paper",
+						className: "rail-marker group flex items-center gap-3 py-1.5",
 						"aria-current": isActive ? "true" : void 0,
 						children: [
 							/* @__PURE__ */ jsx("span", {
-								className: "label w-5 shrink-0 text-right text-neutral-300 tabular-nums transition-colors duration-300 group-hover:text-neutral-700",
+								className: "rail-ordinal label w-5 shrink-0 text-right text-neutral-700 tabular-nums transition-colors duration-300 group-hover:text-ink",
 								children: String(i + 1).padStart(2, "0")
 							}),
 							/* @__PURE__ */ jsxs("span", {
 								className: "relative block h-6 w-3",
 								children: [/* @__PURE__ */ jsx("span", {
 									"aria-hidden": "true",
-									className: cn("absolute left-0 top-1/2 block w-3 -translate-y-1/2 border-t transition-all duration-500 ease-[var(--ease-line)]", isActive ? "w-5 border-accent-700" : "border-line-strong group-hover:w-5 group-hover:border-accent-600")
+									className: cn("rail-tick absolute left-0 top-1/2 block w-3 -translate-y-1/2 border-t transition-all duration-500 ease-[var(--ease-line)]", isActive ? "w-5 border-accent-700" : "border-neutral-700 group-hover:w-5 group-hover:border-accent-600")
 								}), isActive && !reduced ? /* @__PURE__ */ jsx("span", {
 									"aria-hidden": "true",
-									className: "axleta-signal-dot absolute -right-1 top-1/2 h-1 w-1 -translate-y-1/2 rounded-full bg-accent-700"
+									className: "axleta-signal-dot rail-dot absolute -right-1 top-1/2 h-1 w-1 -translate-y-1/2 rounded-full bg-accent-700"
 								}) : null]
 							}),
 							/* @__PURE__ */ jsx("span", {
-								className: cn("label whitespace-nowrap transition-all duration-300", isActive ? "text-ink opacity-100" : "text-neutral-700 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100"),
+								"data-active": isActive ? "true" : void 0,
+								className: cn("rail-label label whitespace-nowrap transition-all duration-300", isActive ? "text-ink opacity-100" : "text-neutral-700 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100"),
 								children: item.label
 							})
 						]
@@ -3639,7 +3677,7 @@ function SectionIndex({ items }) {
 					href: `#${item.id}`,
 					className: "label flex items-center gap-2 whitespace-nowrap border-b border-line-strong py-2 text-neutral-700 transition-colors duration-300 hover:border-accent-700 hover:text-accent-700",
 					children: [/* @__PURE__ */ jsx("span", {
-						className: "text-accent-700 tabular-nums",
+						className: "section-index-ordinal text-accent-700 tabular-nums",
 						children: String(i + 1).padStart(2, "0")
 					}), item.label]
 				})
@@ -3717,7 +3755,7 @@ function CompactHero({ trail, eyebrow, title, lead, reviewed }) {
 				children: lead
 			}),
 			/* @__PURE__ */ jsxs("p", {
-				className: "label mt-8 text-neutral-500",
+				className: "label mt-8 text-neutral-700",
 				children: ["Last reviewed ", /* @__PURE__ */ jsx("time", {
 					dateTime: reviewed,
 					children: formatReviewed(reviewed)
@@ -4672,7 +4710,7 @@ function InsightsPage() {
 								"aria-pressed": active,
 								className: cn("label flex items-center gap-2 border px-3.5 py-2 transition-colors duration-300", active ? "border-ink bg-ink text-paper" : "border-line-strong text-neutral-700 hover:border-accent-700 hover:text-accent-700"),
 								children: [category, /* @__PURE__ */ jsx("span", {
-									className: cn("tabular-nums", active ? "text-neutral-300" : "text-neutral-300"),
+									className: cn("tabular-nums", active ? "text-neutral-300" : "text-neutral-700"),
 									children: count
 								})]
 							})
@@ -4720,7 +4758,7 @@ function InsightsPage() {
 						className: "group grid gap-x-8 gap-y-3 py-8 lg:grid-cols-[10rem_minmax(0,1fr)_auto] lg:items-baseline",
 						children: [
 							/* @__PURE__ */ jsxs("p", {
-								className: "label flex flex-wrap items-center gap-x-3 text-neutral-500",
+								className: "label flex flex-wrap items-center gap-x-3 text-neutral-700",
 								children: [/* @__PURE__ */ jsx("time", {
 									dateTime: article.date,
 									className: "tabular-nums",
@@ -6330,7 +6368,7 @@ function LegalPage({ kind }) {
 							})]
 						})
 					}, section.id)), /* @__PURE__ */ jsxs("p", {
-						className: "label mt-14 border-t border-line-strong pt-8 text-neutral-500",
+						className: "label mt-14 border-t border-line-strong pt-8 text-neutral-700",
 						children: [
 							"End of ",
 							doc.title.toLowerCase(),

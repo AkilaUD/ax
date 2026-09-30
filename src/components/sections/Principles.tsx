@@ -176,7 +176,7 @@ export function InsightsFeature() {
                     }
                     className="group block border-t-2 border-ink pt-7"
                   >
-                    <p className="label flex flex-wrap items-center gap-x-4 gap-y-2 text-neutral-500">
+                    <p className="label flex flex-wrap items-center gap-x-4 gap-y-2 text-neutral-700">
                       <span className="text-accent-700">Latest</span>
                       <span>{selection.featured.category}</span>
                       <time dateTime={selection.featured.date}>
@@ -211,7 +211,7 @@ export function InsightsFeature() {
                         onClick={() => track('insight_click', { title: article.title })}
                         className="group block pt-7"
                       >
-                        <p className="label flex flex-wrap items-center gap-x-3 text-neutral-500">
+                        <p className="label flex flex-wrap items-center gap-x-3 text-neutral-700">
                           <span className="text-accent-700">{article.category}</span>
                           <time dateTime={article.date}>{formatInsightDate(article.date)}</time>
                         </p>
