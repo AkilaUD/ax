@@ -6,7 +6,7 @@
   "description": "Axleta — Technology and Advancement. Public corporate website.",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "chmod +x node_modules/.bin/tsc && tsc --noEmit && vite build",
     "build:spa": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
