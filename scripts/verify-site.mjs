@@ -1,6 +1,6 @@
 /* global URL, console, process */
 
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -8,6 +8,7 @@ const root = dirname(fileURLToPath(new URL('../package.json', import.meta.url)))
 const dist = join(root, 'dist');
 const stylesSource = readFileSync(join(root, 'src', 'styles', 'index.css'), 'utf8');
 const diagramFrameSource = readFileSync(join(root, 'src', 'components', 'diagrams', 'DiagramFrame.tsx'), 'utf8');
+const lazyHeroSource = readFileSync(join(root, 'src', 'components', 'three', 'LazyHeroScene.tsx'), 'utf8');
 
 const routes = [
   { path: '/', file: 'index.html' },
@@ -84,6 +85,8 @@ assert(stylesSource.includes('touch-action'), 'styles: missing touch-action guid
 assert(!stylesSource.includes('overflow-x: visible'), 'styles: contains unsafe horizontal overflow');
 assert(!stylesSource.includes('width: 100vw'), 'styles: contains viewport-locked width');
 assert(diagramFrameSource.includes('data-keyboard-ready'), 'diagrams: missing keyboard-ready marker');
+assert(lazyHeroSource.includes('lazy(() =>'), 'performance: hero scene is not lazy-loaded');
+assert(lazyHeroSource.includes("import('./HeroScene')"), 'performance: hero scene boundary is missing');
 
 for (const [path, html] of documents) {
   for (const image of html.match(/<img\b[^>]*>/gi) ?? []) {
@@ -100,6 +103,8 @@ assert(
 assert(homepage.includes('data-motion-mode="adaptive"'), '/: missing reduced-motion marker');
 assert(homepage.includes('data-system-field'), '/: missing system field');
 assert(homepage.includes('data-webgl-fallback'), '/: missing WebGL fallback marker');
+assert(homepage.includes('data-static-first="true"'), '/: missing static-first hero marker');
+assert(!homepage.includes('<canvas'), '/: homepage requires canvas-only content');
 for (const label of ['ERP', 'APPLICATIONS', 'INFRASTRUCTURE', 'AUTOMATION']) {
   assert(homepage.includes(label), `/: missing hero system label ${label}`);
 }
@@ -117,6 +122,11 @@ for (const marker of [
   'data-insights',
 ]) {
   assert(homepage.includes(marker), `/: missing ${marker}`);
+}
+
+const assetNames = existsSync(join(dist, 'assets')) ? readdirSync(join(dist, 'assets')) : [];
+for (const chunk of ['three', 'gsap', 'motion', 'router', 'react']) {
+  assert(assetNames.some((name) => name.startsWith(`${chunk}-`)), `build: missing ${chunk} manual chunk`);
 }
 
 if (failures.length > 0) {

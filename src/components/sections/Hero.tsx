@@ -41,6 +41,7 @@ export function Hero() {
     <section
       data-surface="ink"
       data-system-field
+      data-static-first="true"
       data-motion-mode="adaptive"
       aria-labelledby="hero-title"
       className="surface-ink relative isolate flex min-h-[92svh] items-end overflow-hidden pb-section-y-tight pt-32 lg:min-h-dvh"
