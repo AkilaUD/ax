@@ -17,7 +17,7 @@ import { cn } from '../../lib/utils';
 
 export function Engagement() {
   return (
-    <Section id="engagement" labelledBy="engagement-title">
+    <Section id="engagement" labelledBy="engagement-title" dataMarkers={['engagement-rail']}>
       <Shell>
         <Grid rails>
           <div className="col-span-4 md:col-span-8 lg:col-span-5">

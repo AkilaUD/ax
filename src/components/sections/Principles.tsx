@@ -20,7 +20,7 @@ import { Body, Eyebrow, Note, Title } from '../ui/Typography';
 
 export function Principles() {
   return (
-    <Section id="principles" labelledBy="principles-title">
+    <Section id="principles" labelledBy="principles-title" dataMarkers={['principles']}>
       <Shell>
         <Grid rails>
           <div className="col-span-4 md:col-span-8 lg:col-span-4">
@@ -64,7 +64,7 @@ export function Principles() {
 
 export function Ecosystem() {
   return (
-    <Section id="ecosystem" tone="sunken" tight labelledBy="ecosystem-title">
+    <Section id="ecosystem" tone="sunken" tight labelledBy="ecosystem-title" dataMarkers={['ecosystem']}>
       <Shell>
         <Reveal>
           <Eyebrow index="08">Technology ecosystem</Eyebrow>
@@ -120,7 +120,7 @@ export function InsightsFeature() {
   const selection = selectInsights(3);
 
   return (
-    <Section id="insights" labelledBy="insights-title" tight>
+    <Section id="insights" labelledBy="insights-title" tight dataMarkers={['insights']}>
       <Shell>
         <Grid rails>
           <div className="col-span-4 md:col-span-8 lg:col-span-4">

@@ -68,6 +68,7 @@ export function Section({
   tight = false,
   labelledBy,
   bleed = false,
+  dataMarkers,
 }: {
   children: ReactNode;
   className?: string;
@@ -76,6 +77,7 @@ export function Section({
   tight?: boolean;
   labelledBy?: string;
   bleed?: boolean;
+  dataMarkers?: readonly string[];
 }) {
   const toneClass =
     tone === 'ink'
@@ -88,6 +90,7 @@ export function Section({
 
   return (
     <section
+      {...Object.fromEntries((dataMarkers ?? []).map((marker) => [`data-${marker}`, 'true']))}
       id={id}
       aria-labelledby={labelledBy}
       data-surface={tone === 'ink' ? 'ink' : undefined}

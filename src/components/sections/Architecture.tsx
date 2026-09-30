@@ -14,7 +14,7 @@ import { routes } from '../../data/site';
 
 export function Architecture() {
   return (
-    <Section id="architecture" labelledBy="architecture-title" tone="ink">
+    <Section id="architecture" labelledBy="architecture-title" tone="ink" dataMarkers={['unified-stack']}>
       <Shell>
         <Grid rails>
           <div className="col-span-4 md:col-span-8 lg:col-span-5">

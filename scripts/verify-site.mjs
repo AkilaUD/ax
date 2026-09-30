@@ -65,6 +65,20 @@ for (const label of ['ERP', 'APPLICATIONS', 'INFRASTRUCTURE', 'AUTOMATION']) {
   assert(homepage.includes(label), `/: missing hero system label ${label}`);
 }
 assert(homepage.includes('href="/contact"'), '/: missing header/contact CTA');
+for (const marker of [
+  'data-connected-practices',
+  'data-erp-spine',
+  'data-companion-network',
+  'data-infrastructure-stack',
+  'data-automation-flow',
+  'data-unified-stack',
+  'data-engagement-rail',
+  'data-principles',
+  'data-ecosystem',
+  'data-insights',
+]) {
+  assert(homepage.includes(marker), `/: missing ${marker}`);
+}
 
 if (failures.length > 0) {
   console.error(`Site verification failed with ${failures.length} issue(s):`);

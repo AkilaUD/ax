@@ -15,6 +15,7 @@ import { routes } from '../../data/site';
 import { track } from '../../lib/analytics';
 import { cn } from '../../lib/utils';
 import { SolutionDiagram } from '../diagrams/SolutionDiagram';
+import { ConnectionPath, DiagramFrame, SystemNode } from '../diagrams';
 import { ArrowLink } from '../ui/Button';
 import { Grid, Shell } from '../ui/Layout';
 import { Reveal } from '../ui/Reveal';
@@ -23,6 +24,22 @@ import { ArchitecturalLabel, Body, Eyebrow, Note, Subtitle, Title } from '../ui/
 export function SolutionsShowcase() {
   return (
     <>
+      <DiagramFrame
+        eyebrow="System layers"
+        title="Four areas. One connected system."
+        description="ERP, companion applications, infrastructure and automation are specified together so each layer supports the one below it and the process running through it."
+      >
+        <div className="relative min-h-72" data-connected-practices>
+          <ConnectionPath d="M 18 50 C 34 18, 66 18, 82 50" label="Connected Axleta system pathway" />
+          <div className="relative z-10 grid grid-cols-2 gap-4 sm:grid-cols-4 sm:items-center">
+            <SystemNode label="ERP" detail="Business core" state="active" />
+            <SystemNode label="Applications" detail="Process extensions" />
+            <SystemNode label="Infrastructure" detail="Operating ground" />
+            <SystemNode label="Automation" detail="Direct pathways" />
+          </div>
+          <p className="label mt-8 text-neutral-500">Architecture / connected practice system / 01-04</p>
+        </div>
+      </DiagramFrame>
       {solutions.map((solution, i) => (
         <SolutionSpread key={solution.id} solution={solution} index={i} />
       ))}
@@ -37,6 +54,11 @@ function SolutionSpread({ solution, index }: { solution: Solution; index: number
   return (
     <section
       id={solution.anchor}
+      data-system-layer={solution.id}
+      data-erp-spine={solution.id === 'erp' ? '' : undefined}
+      data-companion-network={solution.id === 'applications' ? '' : undefined}
+      data-infrastructure-stack={solution.id === 'infrastructure' ? '' : undefined}
+      data-automation-flow={solution.id === 'automation' ? '' : undefined}
       aria-labelledby={`${solution.id}-title`}
       data-surface={ink ? 'ink' : undefined}
       className={cn(
