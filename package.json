@@ -13,7 +13,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "data:insights": "node --experimental-strip-types scripts/fetch-insights.ts",
-    "build:prerender": "vite build --ssr scripts/prerender.tsx --outDir .prerender --emptyOutDir --logLevel warn",
+    "build:prerender": "node ./node_modules/vite/bin/vite.js build --ssr scripts/prerender.tsx --outDir .prerender --emptyOutDir --logLevel warn",
     "prerender": "node .prerender/prerender.js",
     "postbuild": "npm run build:prerender && npm run prerender"
   },
