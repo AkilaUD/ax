@@ -9,6 +9,7 @@
     "build": "node ./node_modules/typescript/bin/tsc --noEmit && node ./node_modules/vite/bin/vite.js build",
     "build:spa": "vite build",
     "preview": "vite preview",
+    "test:site": "node scripts/verify-site.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

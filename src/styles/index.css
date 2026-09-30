@@ -15,6 +15,20 @@
   font-display: swap;
   src: url('/fonts/archivo-latin-wght-normal.woff2') format('woff2-variations');
 }
+
+/* Explicit design-system roles used by the architectural compositions. Keep
+   the existing Tailwind aliases above as the compatibility layer for current
+   route components while new work reads these stable names. */
+:root {
+  --axleta-bg: #111111;
+  --axleta-surface: #f5f3ee;
+  --axleta-text: #111111;
+  --axleta-muted: #575650;
+  --axleta-line: #d7d4cc;
+  --axleta-accent: #0065c3;
+  --axleta-accent-soft: #3fa2ff;
+  --axleta-dark: #0a0b0c;
+}
 @font-face {
   font-family: 'IBM Plex Sans';
   font-style: normal;
@@ -311,6 +325,45 @@
      information architecture is never 3D-only. */
   .poster-frame {
     container-type: inline-size;
+  }
+
+  .axleta-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: 1.5rem;
+  }
+
+  .axleta-frame {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+  }
+
+  .axleta-drafting-grid {
+    background-image:
+      linear-gradient(to right, rgb(17 17 17 / 0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(17 17 17 / 0.06) 1px, transparent 1px);
+    background-size: calc(100% / 4) 100%, 100% 6rem;
+  }
+}
+
+@media (min-width: 48rem) {
+  .axleta-grid {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
+
+  .axleta-drafting-grid {
+    background-size: calc(100% / 8) 100%, 100% 7rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  .axleta-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  .axleta-drafting-grid {
+    background-size: calc(100% / 12) 100%, 100% 8rem;
   }
 }
 
