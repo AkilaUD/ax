@@ -66,6 +66,7 @@ export function resolveMotionMode(): MotionMode {
 export function applyMotionMode(mode: MotionMode): void {
   if (!isBrowser) return;
   document.documentElement.dataset.motion = mode;
+  document.documentElement.dataset.motionMode = 'adaptive';
 }
 
 /** True when the hero WebGL scene is allowed to mount. */

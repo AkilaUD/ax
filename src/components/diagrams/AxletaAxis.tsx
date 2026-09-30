@@ -25,7 +25,13 @@ export function AxletaAxis({ className, animate = true }: { className?: string; 
   const running = animate && seen && !reduced;
 
   return (
-    <div ref={ref} className={className} aria-hidden="true">
+    <div
+      ref={ref}
+      className={className}
+      aria-hidden="true"
+      data-diagram-fallback
+      data-motion-mode="adaptive"
+    >
       <motion.svg
         viewBox="0 0 600 600"
         fill="none"

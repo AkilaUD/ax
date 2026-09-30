@@ -52,6 +52,14 @@ for (const anchor of ['#discover', '#design', '#implement', '#improve']) {
   assert(services.includes(`id="${anchor.slice(1)}"`), `/services: missing ${anchor}`);
 }
 
+const homepage = documents.get('/') ?? '';
+assert(homepage.includes('data-diagram-fallback'), '/: missing accessible diagram fallback');
+assert(
+  /<(section|div)[^>]+(?:aria-label|aria-labelledby)=/i.test(homepage),
+  '/: missing labelled diagram region',
+);
+assert(homepage.includes('data-motion-mode="adaptive"'), '/: missing reduced-motion marker');
+
 if (failures.length > 0) {
   console.error(`Site verification failed with ${failures.length} issue(s):`);
   for (const failure of failures) console.error(`- ${failure}`);
