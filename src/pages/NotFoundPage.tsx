@@ -30,7 +30,7 @@ export default function NotFoundPage() {
   const location = useLocation();
 
   return (
-    <>
+    <div data-error-surface data-diagram-fallback>
       <Seo meta={metaFor('notFound')} />
 
       <Section tight className="pt-32 lg:pt-40">
@@ -131,6 +131,6 @@ export default function NotFoundPage() {
           </Grid>
         </Shell>
       </Section>
-    </>
+    </div>
   );
 }

@@ -55,7 +55,7 @@ export default function ContactPage() {
   );
 
   return (
-    <>
+    <div data-contact-endpoint data-diagram-fallback>
       <Seo meta={metaFor('contact')} trail={TRAIL} jsonLd={[jsonLd]} />
 
       <PageHero
@@ -215,6 +215,6 @@ export default function ContactPage() {
           </Grid>
         </Shell>
       </Section>
-    </>
+    </div>
   );
 }

@@ -133,7 +133,7 @@ export default function GoogleWorkspacePage() {
   );
 
   return (
-    <>
+    <div data-collaboration-system data-diagram-fallback>
       <Seo meta={metaFor('googleWorkspace')} trail={TRAIL} jsonLd={[jsonLd]} />
 
       <PageHero
@@ -399,6 +399,6 @@ export default function GoogleWorkspacePage() {
           </Grid>
         </Shell>
       </Section>
-    </>
+    </div>
   );
 }

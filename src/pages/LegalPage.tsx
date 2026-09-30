@@ -42,7 +42,7 @@ export default function LegalPage({ kind }: { kind: LegalKind }) {
   );
 
   return (
-    <>
+    <div data-legal-surface={kind} data-diagram-fallback>
       <Seo meta={metaFor(kind)} trail={trail} />
 
       <CompactHero
@@ -148,6 +148,6 @@ export default function LegalPage({ kind }: { kind: LegalKind }) {
           </Grid>
         </Shell>
       </Section>
-    </>
+    </div>
   );
 }

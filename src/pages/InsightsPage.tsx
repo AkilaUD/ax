@@ -48,7 +48,7 @@ export default function InsightsPage() {
   );
 
   return (
-    <>
+    <div data-insights-index data-diagram-fallback>
       <Seo meta={metaFor('insights')} trail={TRAIL} />
 
       {/* Header */}
@@ -228,6 +228,6 @@ export default function InsightsPage() {
           </div>
         </Shell>
       </Section>
-    </>
+    </div>
   );
 }

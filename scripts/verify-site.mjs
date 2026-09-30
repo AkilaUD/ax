@@ -56,6 +56,27 @@ assert(solutions.includes('data-diagram-fallback'), '/solutions: missing diagram
 assert(services.includes('data-services-process'), '/services: missing continuous process rail');
 assert(services.includes('data-diagram-fallback'), '/services: missing diagram fallback');
 
+const about = documents.get('/about') ?? '';
+const insights = documents.get('/insights') ?? '';
+const contact = documents.get('/contact') ?? '';
+const workspace = documents.get('/google-workspace') ?? '';
+const terms = documents.get('/terms') ?? '';
+const privacy = documents.get('/privacy') ?? '';
+const notFound = documents.get('/404') ?? '';
+assert(about.includes('data-editorial-manifesto'), '/about: missing editorial manifesto');
+assert(insights.includes('data-insights-index'), '/insights: missing editorial index');
+assert(contact.includes('data-contact-endpoint'), '/contact: missing contact endpoint');
+assert(workspace.includes('data-collaboration-system'), '/google-workspace: missing collaboration system');
+assert(terms.includes('data-legal-surface="terms"'), '/terms: missing legal surface');
+assert(privacy.includes('data-legal-surface="privacy"'), '/privacy: missing legal surface');
+assert(notFound.includes('data-error-surface'), '/404: missing error surface');
+assert(contact.includes('info@axleta.com'), '/contact: missing email');
+assert(contact.includes('wa.me/94710956655'), '/contact: missing WhatsApp link');
+assert(insights.includes('blog.axleta.com'), '/insights: missing blog link');
+assert(workspace.includes('referworkspace.app.goo.gl'), '/google-workspace: missing referral link');
+assert(about.includes('sap.com/partners/partner-edge.html'), '/about: missing SAP PartnerEdge link');
+assert(about.includes('cloud.google.com'), '/about: missing Google Cloud link');
+
 const homepage = documents.get('/') ?? '';
 assert(homepage.includes('data-diagram-fallback'), '/: missing accessible diagram fallback');
 assert(

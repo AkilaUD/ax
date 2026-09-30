@@ -47,7 +47,7 @@ export default function AboutPage() {
   );
 
   return (
-    <>
+    <div data-editorial-manifesto data-diagram-fallback>
       <Seo meta={metaFor('about')} trail={TRAIL} />
 
       <PageHero
@@ -348,6 +348,6 @@ export default function AboutPage() {
           </Grid>
         </Shell>
       </Section>
-    </>
+    </div>
   );
 }
