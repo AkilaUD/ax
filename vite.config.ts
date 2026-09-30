@@ -17,12 +17,8 @@ export default defineConfig({
     reportCompressedSize: true,
     rollupOptions: {
       output: {
-        // Keep the 3D stack out of the initial payload entirely.
         manualChunks(id) {
           if (!id.includes('node_modules')) return undefined;
-          if (id.includes('/three/') || id.includes('three-stdlib') || id.includes('@react-three')) {
-            return 'three';
-          }
           if (id.includes('/gsap/')) return 'gsap';
           if (id.includes('/motion') || id.includes('framer-motion')) return 'motion';
           if (id.includes('/react-router') || id.includes('react-router')) return 'router';

@@ -8,7 +8,7 @@ const root = dirname(fileURLToPath(new URL('../package.json', import.meta.url)))
 const dist = join(root, 'dist');
 const stylesSource = readFileSync(join(root, 'src', 'styles', 'index.css'), 'utf8');
 const diagramFrameSource = readFileSync(join(root, 'src', 'components', 'diagrams', 'DiagramFrame.tsx'), 'utf8');
-const lazyHeroSource = readFileSync(join(root, 'src', 'components', 'three', 'LazyHeroScene.tsx'), 'utf8');
+const heroSource = readFileSync(join(root, 'src', 'components', 'sections', 'Hero.tsx'), 'utf8');
 
 const routes = [
   { path: '/', file: 'index.html' },
@@ -85,8 +85,8 @@ assert(stylesSource.includes('touch-action'), 'styles: missing touch-action guid
 assert(!stylesSource.includes('overflow-x: visible'), 'styles: contains unsafe horizontal overflow');
 assert(!stylesSource.includes('width: 100vw'), 'styles: contains viewport-locked width');
 assert(diagramFrameSource.includes('data-keyboard-ready'), 'diagrams: missing keyboard-ready marker');
-assert(lazyHeroSource.includes('lazy(() =>'), 'performance: hero scene is not lazy-loaded');
-assert(lazyHeroSource.includes("import('./HeroScene')"), 'performance: hero scene boundary is missing');
+assert(!heroSource.includes('LazyHeroScene'), 'hero: Three.js scene is still part of the company entry point');
+assert(!existsSync(join(root, 'src', 'components', 'three', 'HeroScene.tsx')), 'hero: legacy Three.js scene still exists');
 
 for (const [path, html] of documents) {
   for (const image of html.match(/<img\b[^>]*>/gi) ?? []) {
@@ -102,10 +102,9 @@ assert(
 );
 assert(homepage.includes('data-motion-mode="adaptive"'), '/: missing reduced-motion marker');
 assert(homepage.includes('data-system-field'), '/: missing system field');
-assert(homepage.includes('data-command-hero'), '/: missing command hero surface');
-assert(homepage.includes('data-hero-console'), '/: missing live hero console');
-assert(homepage.includes('SYSTEM / LIVE'), '/: missing live system status');
-assert(homepage.includes('data-webgl-fallback'), '/: missing WebGL fallback marker');
+assert(homepage.includes('data-company-field'), '/: missing company capability field');
+assert(homepage.includes('CAPABILITY FIELD'), '/: missing capability field label');
+assert(!homepage.includes('data-webgl-fallback'), '/: hero still exposes a WebGL visual layer');
 assert(homepage.includes('data-static-first="true"'), '/: missing static-first hero marker');
 assert(!homepage.includes('<canvas'), '/: homepage requires canvas-only content');
 for (const label of ['ERP', 'APPLICATIONS', 'INFRASTRUCTURE', 'AUTOMATION']) {
@@ -130,9 +129,10 @@ assert(homepage.includes('data-system-brief'), '/: missing system brief surface'
 assert(homepage.includes('data-principles-console'), '/: missing principles console');
 
 const assetNames = existsSync(join(dist, 'assets')) ? readdirSync(join(dist, 'assets')) : [];
-for (const chunk of ['three', 'gsap', 'motion', 'router', 'react']) {
+for (const chunk of ['gsap', 'motion', 'router', 'react']) {
   assert(assetNames.some((name) => name.startsWith(`${chunk}-`)), `build: missing ${chunk} manual chunk`);
 }
+assert(!assetNames.some((name) => name.startsWith('three-')), 'build: Three.js chunk still emitted for the company site');
 
 if (failures.length > 0) {
   console.error(`Site verification failed with ${failures.length} issue(s):`);

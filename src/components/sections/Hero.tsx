@@ -1,110 +1,91 @@
 /**
- * The homepage entry point: an operating view of the system, not a brochure
- * cover. The static console is the first meaningful paint; WebGL is optional
- * atmosphere layered behind it on capable desktop devices.
+ * Company-first homepage entry point. GSAP choreographs the editorial reveal
+ * and the capability field; there is no product dashboard or WebGL dependency
+ * in the first viewport.
  */
-import { motion } from 'motion/react';
+import gsap from 'gsap';
+import { Link } from 'react-router-dom';
 import { company } from '../../data/company';
 import { contact, routes } from '../../data/site';
-import { heroTimeline, duration, ease } from '../../lib/motion';
 import { track } from '../../lib/analytics';
+import { useGsapContext } from '../../hooks/useGsapContext';
 import { usePrefersReducedMotion } from '../../hooks/useMotionMode';
-import { LazyHeroScene } from '../three/LazyHeroScene';
 import { ArrowLink, CtaPair } from '../ui/Button';
 import { Shell } from '../ui/Layout';
 import { Eyebrow, Lead } from '../ui/Typography';
-import { HeroConsoleIndex, HeroSystemConsole } from './HeroSystemConsole';
+import { CompanyCapabilityField } from './CompanyCapabilityField';
 
 export function Hero() {
   const reduced = usePrefersReducedMotion();
+  const scope = useGsapContext(() => {
+    const revealTargets = '[data-hero-reveal]';
 
-  const rise = (delay: number) => ({
-    initial: reduced ? { opacity: 1 } : { opacity: 0, y: 26 },
-    animate: { opacity: 1, y: 0 },
-    transition: {
-      duration: reduced ? 0 : duration.reveal,
-      delay: reduced ? 0 : delay,
-      ease: ease.entrance,
-    },
-  });
+    if (reduced) {
+      gsap.set(revealTargets, { clearProps: 'all' });
+      return;
+    }
+
+    gsap
+      .timeline({ defaults: { ease: 'power3.out' } })
+      .fromTo('[data-hero-rule]', { scaleX: 0, transformOrigin: 'left center' }, { scaleX: 1, duration: 0.8 })
+      .fromTo(revealTargets, { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 0.65, stagger: 0.08 }, '-=0.42');
+  }, [reduced]);
 
   return (
     <section
+      ref={scope}
       data-surface="ink"
       data-system-field
-      data-command-hero
+      data-company-hero
       data-static-first="true"
       data-motion-mode="adaptive"
       aria-labelledby="hero-title"
-      className="command-hero surface-ink relative isolate overflow-hidden pb-10 pt-32 lg:min-h-dvh lg:pb-12"
+      className="company-hero surface-ink relative isolate overflow-hidden pb-10 pt-32 lg:min-h-dvh lg:pb-12"
     >
-      <div aria-hidden="true" className="command-hero__grid" />
-      <div aria-hidden="true" className="command-hero__scanline" />
-
-      <div
-        aria-hidden="true"
-        data-webgl-fallback
-        className="pointer-events-none absolute inset-y-0 right-0 z-0 w-full opacity-30 lg:w-[54%] lg:opacity-55"
-      >
-        <LazyHeroScene className="absolute inset-0" />
-      </div>
+      <div aria-hidden="true" className="company-hero__grid" />
+      <div aria-hidden="true" className="company-hero__rule" data-hero-rule />
 
       <Shell className="relative z-10 w-full">
-        <div className="command-hero__meta">
-          <motion.div {...rise(heroTimeline.eyebrowAt)}>
-            <Eyebrow index="01" tone="ink" live>
-              Technology and advancement / est. {company.founded}
-            </Eyebrow>
-          </motion.div>
-          <motion.p {...rise(heroTimeline.eyebrowAt + 0.08)} className="label text-neutral-500">
-            Operating architecture for SMEs
-          </motion.p>
+        <div className="company-hero__meta" data-hero-reveal>
+          <Eyebrow index="01" tone="ink" live>
+            Technology and advancement / est. {company.founded}
+          </Eyebrow>
+          <span className="label text-neutral-500">An independent technology company for SMEs</span>
         </div>
 
-        <div className="command-hero__layout">
-          <div className="command-hero__copy">
-            <motion.h1
-              id="hero-title"
-              className="command-hero__title"
-              initial={reduced ? { opacity: 1 } : { opacity: 0, y: 34 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: reduced ? 0 : duration.reveal * 1.15,
-                delay: reduced ? 0 : heroTimeline.headlineAt,
-                ease: ease.entrance,
-              }}
-            >
-              <span className="block">The systems</span>
-              <span className="block text-accent-300">behind the business.</span>
-              <span className="command-hero__title-line">Designed. Connected. Kept running.</span>
-            </motion.h1>
+        <div className="company-hero__layout">
+          <div className="company-hero__copy">
+            <h1 id="hero-title" className="company-hero__title" data-hero-reveal>
+              <span className="block text-accent-300">Technology and advancement</span>
+              <span className="block">for SME operations.</span>
+            </h1>
 
-            <motion.div {...rise(heroTimeline.ledeAt)} className="command-hero__lede">
-              <p className="label text-accent-300">ERP / APPLICATIONS / INFRASTRUCTURE / AUTOMATION</p>
+            <div className="company-hero__lede" data-hero-reveal>
+              <p className="label text-accent-300">THE COMPANY / THE CAPABILITIES / THE CONTINUITY</p>
               <Lead tone="ink" className="mt-6 max-w-xl text-neutral-300">
-                Axleta connects the systems that keep an SME moving: SAP Business One and
-                S/4HANA Public Cloud, the applications around them, the infrastructure below
-                them, and the automation between them.
+                Axleta designs and keeps running the technology around a business: ERP,
+                companion applications, infrastructure, cloud, automation and integration.
+                The right system is the one that fits the way your people work.
               </Lead>
-            </motion.div>
+            </div>
 
-            <motion.div {...rise(heroTimeline.actionsAt)} className="mt-10">
+            <div className="mt-10" data-hero-reveal>
               <CtaPair
                 tone="ink"
                 primary={{
                   to: routes.contact,
-                  label: 'Discuss requirements',
+                  label: 'Start a conversation',
                   onClick: () => track('cta_click', { label: 'hero_discuss' }),
                 }}
                 secondary={{
-                  to: routes.solutions,
-                  label: 'Explore the system',
-                  onClick: () => track('cta_click', { label: 'hero_solutions' }),
+                  to: routes.about,
+                  label: 'Meet Axleta',
+                  onClick: () => track('cta_click', { label: 'hero_about' }),
                 }}
               />
-            </motion.div>
+            </div>
 
-            <motion.div {...rise(heroTimeline.actionsAt + 0.12)} className="command-hero__contact">
+            <div className="company-hero__contact" data-hero-reveal>
               <span className="label text-neutral-500">Direct line</span>
               <a
                 href={`mailto:${contact.email}`}
@@ -112,24 +93,25 @@ export function Hero() {
               >
                 {contact.email}
               </a>
-              <span className="command-hero__contact-rule" aria-hidden="true" />
+              <span className="company-hero__contact-rule" aria-hidden="true" />
               <span className="label text-neutral-500">{contact.coverage}</span>
-            </motion.div>
+            </div>
           </div>
 
-          <motion.div {...rise(0.72)} className="command-hero__visual">
-            <HeroSystemConsole />
-            <HeroConsoleIndex />
-          </motion.div>
+          <div className="company-hero__visual" data-hero-reveal>
+            <CompanyCapabilityField />
+          </div>
         </div>
 
-        <motion.div {...rise(1.05)} className="command-hero__footer">
-          <ArrowLink to={routes.about} tone="ink">
-            Why Axleta
+        <div className="company-hero__footer" data-hero-reveal>
+          <ArrowLink to={routes.solutions} tone="ink">
+            Explore what we do
           </ArrowLink>
-          <span className="label text-neutral-500">The business system, treated as a system</span>
-          <span className="label text-accent-300">Scroll to inspect / 01</span>
-        </motion.div>
+          <Link to={routes.insights} className="label text-neutral-500 hover:text-accent-300">
+            Ideas, systems and practice →
+          </Link>
+          <span className="label text-accent-300">Scroll / 01</span>
+        </div>
       </Shell>
     </section>
   );
