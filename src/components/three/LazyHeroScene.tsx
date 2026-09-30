@@ -10,12 +10,19 @@
  * painted underneath, so the hero is never empty.
  */
 import { Suspense, lazy } from 'react';
+import { useWebGLSupport } from '../../hooks/useWebGLSupport';
+import { useWebglAllowed } from '../../hooks/useMotionMode';
 
 const HeroSceneImpl = lazy(() =>
   import('./HeroScene').then((m) => ({ default: m.HeroScene })),
 );
 
 export function LazyHeroScene({ className }: { className?: string }) {
+  const supported = useWebGLSupport();
+  const allowed = useWebglAllowed();
+
+  if (!supported || !allowed) return null;
+
   return (
     <Suspense fallback={null}>
       <HeroSceneImpl className={className} />

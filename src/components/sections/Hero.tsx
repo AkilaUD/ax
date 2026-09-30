@@ -40,6 +40,8 @@ export function Hero() {
   return (
     <section
       data-surface="ink"
+      data-system-field
+      data-motion-mode="adaptive"
       aria-labelledby="hero-title"
       className="surface-ink relative isolate flex min-h-[92svh] items-end overflow-hidden pb-section-y-tight pt-32 lg:min-h-dvh"
     >
@@ -57,6 +59,7 @@ export function Hero() {
       {/* The axis, right side, plus its WebGL counterpart */}
       <div
         aria-hidden="true"
+        data-webgl-fallback
         className="pointer-events-none absolute -right-[18%] top-1/2 aspect-square w-[130%] max-w-none -translate-y-1/2 opacity-70 sm:right-[-8%] sm:w-[78%] lg:right-[-2%] lg:w-[46%] lg:opacity-100"
       >
         <AxletaAxis className="absolute inset-0" animate={false} />

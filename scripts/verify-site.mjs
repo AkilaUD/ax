@@ -59,6 +59,12 @@ assert(
   '/: missing labelled diagram region',
 );
 assert(homepage.includes('data-motion-mode="adaptive"'), '/: missing reduced-motion marker');
+assert(homepage.includes('data-system-field'), '/: missing system field');
+assert(homepage.includes('data-webgl-fallback'), '/: missing WebGL fallback marker');
+for (const label of ['ERP', 'APPLICATIONS', 'INFRASTRUCTURE', 'AUTOMATION']) {
+  assert(homepage.includes(label), `/: missing hero system label ${label}`);
+}
+assert(homepage.includes('href="/contact"'), '/: missing header/contact CTA');
 
 if (failures.length > 0) {
   console.error(`Site verification failed with ${failures.length} issue(s):`);
