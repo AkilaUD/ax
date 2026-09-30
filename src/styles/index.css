@@ -337,6 +337,8 @@
     position: relative;
     isolation: isolate;
     overflow: hidden;
+    max-width: 100%;
+    touch-action: pan-y;
   }
 
   .axleta-drafting-grid {
@@ -344,6 +346,14 @@
       linear-gradient(to right, rgb(17 17 17 / 0.06) 1px, transparent 1px),
       linear-gradient(to bottom, rgb(17 17 17 / 0.06) 1px, transparent 1px);
     background-size: calc(100% / 4) 100%, 100% 6rem;
+  }
+
+  .axleta-frame [data-connection-path] {
+    touch-action: none;
+  }
+
+  .axleta-frame button {
+    touch-action: manipulation;
   }
 }
 
@@ -364,6 +374,16 @@
 
   .axleta-drafting-grid {
     background-size: calc(100% / 12) 100%, 100% 8rem;
+  }
+}
+
+@media (max-width: 47.99rem) {
+  .axleta-frame {
+    min-height: 0;
+  }
+
+  .axleta-frame [data-connection-path] {
+    opacity: 0.58;
   }
 }
 

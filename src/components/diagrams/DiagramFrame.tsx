@@ -23,6 +23,7 @@ export function DiagramFrame({
       aria-labelledby={`${titleId}-title`}
       className={cn('axleta-frame axleta-drafting-grid', surface === 'ink' ? 'surface-ink' : 'bg-surface')}
       data-diagram-fallback
+      data-keyboard-ready="true"
       data-motion-mode="adaptive"
     >
       <div className="relative z-10 mx-auto grid max-w-shell grid-cols-4 gap-x-6 gap-y-8 px-gutter py-section-y-tight md:grid-cols-8 lg:grid-cols-12">

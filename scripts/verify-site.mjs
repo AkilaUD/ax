@@ -6,6 +6,8 @@ import { dirname, join } from 'node:path';
 
 const root = dirname(fileURLToPath(new URL('../package.json', import.meta.url)));
 const dist = join(root, 'dist');
+const stylesSource = readFileSync(join(root, 'src', 'styles', 'index.css'), 'utf8');
+const diagramFrameSource = readFileSync(join(root, 'src', 'components', 'diagrams', 'DiagramFrame.tsx'), 'utf8');
 
 const routes = [
   { path: '/', file: 'index.html' },
@@ -76,6 +78,18 @@ assert(insights.includes('blog.axleta.com'), '/insights: missing blog link');
 assert(workspace.includes('referworkspace.app.goo.gl'), '/google-workspace: missing referral link');
 assert(about.includes('sap.com/partners/partner-edge.html'), '/about: missing SAP PartnerEdge link');
 assert(about.includes('cloud.google.com'), '/about: missing Google Cloud link');
+
+assert(stylesSource.includes('@media (prefers-reduced-motion: reduce)'), 'styles: missing reduced-motion rules');
+assert(stylesSource.includes('touch-action'), 'styles: missing touch-action guidance for interactive diagrams');
+assert(!stylesSource.includes('overflow-x: visible'), 'styles: contains unsafe horizontal overflow');
+assert(!stylesSource.includes('width: 100vw'), 'styles: contains viewport-locked width');
+assert(diagramFrameSource.includes('data-keyboard-ready'), 'diagrams: missing keyboard-ready marker');
+
+for (const [path, html] of documents) {
+  for (const image of html.match(/<img\b[^>]*>/gi) ?? []) {
+    assert(/\balt=["'][^"']*["']/i.test(image), `${path}: image is missing alt text`);
+  }
+}
 
 const homepage = documents.get('/') ?? '';
 assert(homepage.includes('data-diagram-fallback'), '/: missing accessible diagram fallback');
