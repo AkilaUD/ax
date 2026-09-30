@@ -1,0 +1,16 @@
+{
+  "redirects": [
+    { "source": "/home", "destination": "/", "permanent": true },
+    { "source": "/about-axleta", "destination": "/about", "permanent": true },
+    { "source": "/contact-axleta", "destination": "/contact", "permanent": true },
+    { "source": "/google-workspace-gemini", "destination": "/google-workspace", "permanent": true },
+    { "source": "/terms-conditions", "destination": "/terms", "permanent": true },
+    { "source": "/privacy-policy", "destination": "/privacy", "permanent": true }
+  ],
+  "headers": [
+    {
+      "source": "/assets/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    }
+  ]
+}

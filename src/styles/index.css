@@ -1,0 +1,361 @@
+@import 'tailwindcss';
+
+/* =========================================================================
+   AXLETA DESIGN SYSTEM
+   Accent ramp is hue-matched (210-217deg) to the Axleta logo and aligned to
+   the SAP Blue palette. Role assignment is contrast-driven, not decorative:
+   the bright end is never a large fill on a light ground.
+   ========================================================================= */
+
+/* ---------- Fonts (self-hosted, latin subset) ---------- */
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/archivo-latin-wght-normal.woff2') format('woff2-variations');
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-sans-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-sans-latin-500-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-sans-latin-600-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-mono-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-mono-latin-500-normal.woff2') format('woff2');
+}
+
+/* ---------- Tokens ---------- */
+@theme {
+  /* Grounds */
+  --color-ink: #111111;
+  --color-graphite: #2a2a28;
+  --color-paper: #f5f3ee;
+  --color-white: #ffffff;
+
+  /* Warm neutral ladder. 575650 is the only one cleared for small text on paper. */
+  --color-neutral-900: #111111;
+  --color-neutral-700: #575650;
+  --color-neutral-500: #8b8a84;
+  --color-neutral-300: #a9a79f;
+  --color-line: #d7d4cc;
+  --color-line-strong: #bfbcb2;
+
+  /* Brand ramp */
+  --color-accent-900: #00305d;
+  --color-accent-800: #003b72;
+  --color-accent-700: #0055a5;
+  --color-accent-600: #0065c3;
+  --color-accent-500: #0074e2;
+  --color-accent-400: #168eff;
+  --color-accent-300: #3fa2ff;
+  --color-accent-100: #8bc7ff;
+
+  /* Semantic aliases — components read these, not the ramp, so roles stay honest */
+  --color-surface: var(--color-paper);
+  --color-surface-raised: var(--color-white);
+  --color-surface-sunken: #efece5;
+  --color-fg: var(--color-ink);
+  --color-fg-muted: var(--color-neutral-700);
+  --color-fg-subtle: var(--color-neutral-500);
+  --color-border: var(--color-line);
+  --color-action: var(--color-accent-800);
+  --color-action-hover: var(--color-accent-900);
+  --color-signal: var(--color-accent-400);
+
+  /* Type */
+  --font-display: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  --font-sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  --text-micro: 0.6875rem;
+  --text-eyebrow: clamp(0.75rem, 0.723rem + 0.14vw, 0.875rem);
+  --text-body: clamp(1rem, 0.973rem + 0.135vw, 1.1875rem);
+  --text-lead: clamp(1.25rem, 1.116rem + 0.67vw, 1.625rem);
+  --text-stat: clamp(2rem, 1.5rem + 2.5vw, 3.5rem);
+  --text-title: clamp(2.625rem, 1.86rem + 3.82vw, 4.5rem);
+  --text-hero: clamp(2.75rem, 1.53rem + 6.1vw, 7.75rem);
+  --text-display: clamp(2.25rem, 1.24rem + 5.05vw, 5.75rem);
+
+  --tracking-label: 0.14em;
+  --tracking-wide: 0.02em;
+  --tracking-tightest: -0.035em;
+
+  --leading-tight: 0.98;
+  --leading-snug: 1.14;
+  --leading-body: 1.62;
+  --leading-loose: 1.78;
+
+  /* Layout */
+  --container-shell: 90rem; /* 1440px hard ceiling on the 12-col grid */
+  --container-reading: 40rem; /* comfortable measure for prose */
+  --container-limited: 62rem;
+
+  /* Bare values first, so `var(--gutter)` works in plain CSS rules. */
+  --gutter: clamp(1.25rem, 0.65rem + 3vw, 4.5rem);
+  --section-y: clamp(5.5rem, 3.4rem + 10.5vw, 13.75rem);
+  --section-y-tight: clamp(3.75rem, 2.6rem + 5.8vw, 7.5rem);
+
+  /* Namespaced into the spacing scale so px-gutter / py-section-y exist. */
+  --spacing-gutter: var(--gutter);
+  --spacing-section-y: var(--section-y);
+  --spacing-section-y-tight: var(--section-y-tight);
+
+  /* Shape — sharp-leaning, per the brief's radius philosophy */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+
+  /* Motion */
+  --ease-standard: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-entrance: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-line: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Breakpoints */
+  --breakpoint-xs: 24rem;
+  --breakpoint-rail: 78rem; /* coordinate rail appears here */
+}
+
+/* ---------- Base ---------- */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    border-color: var(--color-border);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+    /* The sticky header must not cover in-page anchor targets. */
+    scroll-padding-top: 6.5rem;
+  }
+
+  body {
+    background-color: var(--color-surface);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-tightest);
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Never hide the real cursor; this only ever adds a ring. */
+  :focus-visible {
+    outline: 2px solid var(--color-accent-600);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  [data-surface='ink'] :focus-visible {
+    outline-color: var(--color-accent-300);
+  }
+
+  ::selection {
+    background-color: var(--color-accent-800);
+    color: var(--color-paper);
+  }
+
+  /* Firefox / WebKit scrollbar polish — cosmetic only, never a scroll trap. */
+  @supports (scrollbar-width: thin) {
+    html {
+      scrollbar-width: thin;
+      scrollbar-color: var(--color-line-strong) transparent;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}
+
+/* ---------- Component-level primitives ---------- */
+@layer components {
+  /* Signature B — System Index */
+  .label {
+    font-family: var(--font-mono);
+    font-size: var(--text-micro);
+    font-weight: 500;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+
+  .measure {
+    max-width: var(--container-reading);
+  }
+
+  .measure-narrow {
+    max-width: 32rem;
+  }
+
+  /* Inked section: the rhythm device that keeps page rhythms from repeating. */
+  .surface-ink {
+    background-color: var(--color-ink);
+    color: var(--color-paper);
+  }
+  .surface-ink ::selection {
+    background-color: var(--color-accent-300);
+    color: var(--color-ink);
+  }
+
+  /* Hairline rule that reads as an engineering line, not a card border. */
+  .rule-t {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .skip-link {
+    position: fixed;
+    top: 0.5rem;
+    left: 0.5rem;
+    z-index: 100;
+    transform: translateY(-160%);
+    background-color: var(--color-ink);
+    color: var(--color-paper);
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: var(--text-micro);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    transition: transform 0.2s var(--ease-entrance);
+  }
+  .skip-link:focus-visible {
+    transform: translateY(0);
+  }
+
+  /* The static SVG stand-in for the WebGL hero. Always in the DOM so the
+     information architecture is never 3D-only. */
+  .poster-frame {
+    container-type: inline-size;
+  }
+}
+
+/* ---------- Ink-surface overrides (intentionally unlayered) ----------
+   Tailwind emits colour utilities in @layer utilities, which always wins over
+   @layer components. These rules therefore live outside any layer so the ink
+   palette actually reaches the DOM: `.muted` is context-aware (neutral-700 on
+   paper, neutral-300 on ink) and must not be overridden by a `text-*` utility.
+   Hover/focus states are enumerated so interaction feedback survives.
+   Contrast: neutral-300 #a9a79f on ink #111111 = 7.8:1, accent-300 outline
+   on ink = 7.1:1. */
+.surface-ink .muted {
+  color: var(--color-neutral-300);
+}
+.surface-ink .muted:hover {
+  color: var(--color-paper);
+}
+.surface-ink :focus-visible {
+  outline-color: var(--color-accent-300);
+}
+.surface-ink .rule-t {
+  border-top-color: rgb(255 255 255 / 0.14);
+}
+
+/* ---------- Keyframes (decorative only; all honour reduced motion) ---------- */
+@keyframes axleta-signal {
+  0% {
+    offset-distance: 0%;
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  100% {
+    offset-distance: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes axleta-tick {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+    opacity: 0.35;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 0.9;
+  }
+}
+
+@keyframes axleta-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -6px, 0);
+  }
+}
+
+[data-motion='lite'] .axleta-decorative,
+[data-motion='lite'] .axleta-signal-dot {
+  animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .axleta-decorative,
+  .axleta-signal-dot {
+    animation: none !important;
+  }
+}
