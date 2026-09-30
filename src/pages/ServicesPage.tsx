@@ -20,6 +20,7 @@ import { metaFor } from '../lib/seo';
 import { CoordinateRail, SectionIndex } from '../components/layout/CoordinateRail';
 import { PageHero } from '../components/layout/PageHero';
 import { CtaPair } from '../components/ui/Button';
+import { ProcessRail } from '../components/diagrams';
 import { Grid, Rule, Section, Shell } from '../components/ui/Layout';
 import { Reveal } from '../components/ui/Reveal';
 import { ArchitecturalLabel, Body, Eyebrow, Note, Subtitle, Title } from '../components/ui/Typography';
@@ -65,6 +66,15 @@ export default function ServicesPage() {
       </PageHero>
 
       <CoordinateRail items={railItems} />
+
+      <div className="bg-surface-sunken px-gutter py-section-y-tight" data-services-process data-diagram-fallback>
+        <Shell>
+          <ProcessRail
+            steps={serviceStages.map((stage) => ({ label: stage.title, detail: stage.summary }))}
+            activeIndex={0}
+          />
+        </Shell>
+      </div>
 
       {/* The stages */}
       {serviceStages.map((stage, index) => (

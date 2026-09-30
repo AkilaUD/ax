@@ -51,6 +51,10 @@ const services = documents.get('/services') ?? '';
 for (const anchor of ['#discover', '#design', '#implement', '#improve']) {
   assert(services.includes(`id="${anchor.slice(1)}"`), `/services: missing ${anchor}`);
 }
+assert(solutions.includes('data-solutions-atlas'), '/solutions: missing system-layer atlas');
+assert(solutions.includes('data-diagram-fallback'), '/solutions: missing diagram fallback');
+assert(services.includes('data-services-process'), '/services: missing continuous process rail');
+assert(services.includes('data-diagram-fallback'), '/services: missing diagram fallback');
 
 const homepage = documents.get('/') ?? '';
 assert(homepage.includes('data-diagram-fallback'), '/: missing accessible diagram fallback');

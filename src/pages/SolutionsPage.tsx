@@ -20,6 +20,7 @@ import { CoordinateRail, SectionIndex } from '../components/layout/CoordinateRai
 import { PageHero } from '../components/layout/PageHero';
 import { SystemArchitecture } from '../components/diagrams/SystemArchitecture';
 import { SolutionDiagram } from '../components/diagrams/SolutionDiagram';
+import { ConnectionPath, DiagramFrame, SystemNode } from '../components/diagrams';
 import { Grid, Rule, Section, Shell } from '../components/ui/Layout';
 import { Reveal } from '../components/ui/Reveal';
 import {
@@ -71,6 +72,27 @@ export default function SolutionsPage() {
 
       <CoordinateRail items={railItems} />
 
+      <DiagramFrame
+        eyebrow="System atlas"
+        title="A portfolio with a structure."
+        description="Each practice has a distinct job, but the value is in the connection: infrastructure carries the core, applications extend it, and automation routes work across the whole system."
+      >
+        <div className="relative min-h-72" data-solutions-atlas>
+          <ConnectionPath d="M 16 50 C 30 16, 70 16, 84 50" label="Solutions system pathway" />
+          <div className="relative z-10 grid grid-cols-2 gap-4 sm:grid-cols-4 sm:items-center">
+            {solutions.map((solution, index) => (
+              <SystemNode
+                key={solution.id}
+                label={solution.category}
+                detail={index === 0 ? 'Business core' : solution.architecturalLabel}
+                state={index === 0 ? 'active' : 'default'}
+              />
+            ))}
+          </div>
+          <p className="label mt-8 text-neutral-500">Portfolio / layer map / 01-04</p>
+        </div>
+      </DiagramFrame>
+
       {solutions.map((solution, index) => (
         <Section
           key={solution.id}
@@ -78,6 +100,7 @@ export default function SolutionsPage() {
           labelledBy={`${solution.id}-title`}
           tone={index % 2 === 1 ? 'ink' : 'paper'}
           className="scroll-mt-24"
+          dataMarkers={['diagram-fallback']}
         >
           <Shell>
             <Grid rails>
