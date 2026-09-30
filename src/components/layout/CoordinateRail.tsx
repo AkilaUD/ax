@@ -47,8 +47,7 @@ function surfaceAt(x: number, y: number): Surface {
   return 'paper';
 }
 
-/** Hit-testing costs a style recalc per marker, so only redo it on real movement. */
-const SURFACE_REFRESH_PX = 24;
+/** Hit-testing costs a style recalc per marker, so it is skipped while hidden. */
 
 export function CoordinateRail({ items }: { items: RailItem[] }) {
   const [active, setActive] = useState(items[0]?.id ?? '');
@@ -58,7 +57,7 @@ export function CoordinateRail({ items }: { items: RailItem[] }) {
   const [surfaces, setSurfaces] = useState<Record<string, Surface>>({});
   const reduced = usePrefersReducedMotion();
   const railRef = useRef<HTMLDivElement>(null);
-  const lastSurfaceY = useRef(Number.NEGATIVE_INFINITY);
+  const lastStamps = useRef<Record<string, Surface>>({});
 
   // Only show once the user has committed to reading.
   useEffect(() => {
@@ -107,14 +106,22 @@ export function CoordinateRail({ items }: { items: RailItem[] }) {
 
       setActive(current);
 
-      if (Math.abs(window.scrollY - lastSurfaceY.current) < SURFACE_REFRESH_PX) return;
-      lastSurfaceY.current = window.scrollY;
+      // Skipped while faded out: the stamps are not painted. Below 78rem the rail
+      // is `display:none`, which shows up as zero-sized marker rects.
+      const rail = railRef.current;
+      if (!rail || !visible) return;
       const next: Record<string, Surface> = {};
       for (const item of items) {
-        const marker = railRef.current?.querySelector<HTMLElement>(`[data-rail-id="${item.id}"]`);
-        const rect = marker?.getBoundingClientRect();
-        next[item.id] = rect ? surfaceAt(rect.left + rect.width / 2, rect.top + rect.height / 2) : 'paper';
+        // Probe the ordinal glyph, not the marker box: the label sits inside the
+        // marker and its box can extend across a different surface, while the
+        // ordinal is the pixel whose colour this stamp controls.
+        const glyph = rail.querySelector<HTMLElement>(`[data-rail-id="${item.id}"] .rail-ordinal`);
+        const rect = glyph?.getBoundingClientRect();
+        next[item.id] = rect && rect.width > 0 ? surfaceAt(rect.left + rect.width / 2, rect.top + rect.height / 2) : 'paper';
       }
+      const previous = lastStamps.current;
+      if (items.every((item) => previous[item.id] === next[item.id])) return;
+      lastStamps.current = next;
       setSurfaces(next);
     };
 
@@ -123,15 +130,35 @@ export function CoordinateRail({ items }: { items: RailItem[] }) {
       frame = window.requestAnimationFrame(read);
     };
 
+    // Scroll reveals can surface an ink section under the rail without moving
+    // the page, so re-resolve once their transitions finish. The rail's own
+    // transitions are ignored to avoid feeding its refresh loop.
+    const onTransitionEnd = (event: TransitionEvent) => {
+      const target = event.target as Node | null;
+      if (!target || railRef.current?.contains(target)) return;
+      onScroll();
+    };
+
     read();
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll, { passive: true });
+    // Late-loading assets and webfonts shift the sections under the rail without
+    // producing a scroll event, so re-resolve once the page has settled.
+    window.addEventListener('load', onScroll);
+    document.addEventListener('transitionend', onTransitionEnd, true);
+    void document.fonts?.ready.then(onScroll);
+    // Safety net: reveals, lazy images and sticky offsets can move a surface
+    // under a stationary rail with no event to observe, so settle periodically.
+    const settle = window.setInterval(onScroll, 250);
     return () => {
       if (frame) window.cancelAnimationFrame(frame);
+      window.clearInterval(settle);
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
+      window.removeEventListener('load', onScroll);
+      document.removeEventListener('transitionend', onTransitionEnd, true);
     };
-  }, [items]);
+  }, [items, visible]);
 
   if (items.length < 2) return null;
 

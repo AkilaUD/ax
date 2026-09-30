@@ -3546,15 +3546,14 @@ function surfaceAt(x, y) {
 	}
 	return "paper";
 }
-/** Hit-testing costs a style recalc per marker, so only redo it on real movement. */
-var SURFACE_REFRESH_PX = 24;
+/** Hit-testing costs a style recalc per marker, so it is skipped while hidden. */
 function CoordinateRail({ items }) {
 	const [active, setActive] = useState(items[0]?.id ?? "");
 	const [visible, setVisible] = useState(false);
 	const [surfaces, setSurfaces] = useState({});
 	const reduced = usePrefersReducedMotion();
 	const railRef = useRef(null);
-	const lastSurfaceY = useRef(Number.NEGATIVE_INFINITY);
+	const lastStamps = useRef({});
 	useEffect(() => {
 		const read = () => setVisible(window.scrollY > window.innerHeight * .6);
 		read();
@@ -3592,28 +3591,43 @@ function CoordinateRail({ items }) {
 				}
 			}
 			setActive(current);
-			if (Math.abs(window.scrollY - lastSurfaceY.current) < SURFACE_REFRESH_PX) return;
-			lastSurfaceY.current = window.scrollY;
+			const rail = railRef.current;
+			if (!rail || !visible) return;
 			const next = {};
 			for (const item of items) {
-				const rect = (railRef.current?.querySelector(`[data-rail-id="${item.id}"]`))?.getBoundingClientRect();
-				next[item.id] = rect ? surfaceAt(rect.left + rect.width / 2, rect.top + rect.height / 2) : "paper";
+				const rect = rail.querySelector(`[data-rail-id="${item.id}"] .rail-ordinal`)?.getBoundingClientRect();
+				next[item.id] = rect && rect.width > 0 ? surfaceAt(rect.left + rect.width / 2, rect.top + rect.height / 2) : "paper";
 			}
+			const previous = lastStamps.current;
+			if (items.every((item) => previous[item.id] === next[item.id])) return;
+			lastStamps.current = next;
 			setSurfaces(next);
 		};
 		const onScroll = () => {
 			if (frame) return;
 			frame = window.requestAnimationFrame(read);
 		};
+		const onTransitionEnd = (event) => {
+			const target = event.target;
+			if (!target || railRef.current?.contains(target)) return;
+			onScroll();
+		};
 		read();
 		window.addEventListener("scroll", onScroll, { passive: true });
 		window.addEventListener("resize", onScroll, { passive: true });
+		window.addEventListener("load", onScroll);
+		document.addEventListener("transitionend", onTransitionEnd, true);
+		document.fonts?.ready.then(onScroll);
+		const settle = window.setInterval(onScroll, 250);
 		return () => {
 			if (frame) window.cancelAnimationFrame(frame);
+			window.clearInterval(settle);
 			window.removeEventListener("scroll", onScroll);
 			window.removeEventListener("resize", onScroll);
+			window.removeEventListener("load", onScroll);
+			document.removeEventListener("transitionend", onTransitionEnd, true);
 		};
-	}, [items]);
+	}, [items, visible]);
 	if (items.length < 2) return null;
 	return /* @__PURE__ */ jsx("div", {
 		ref: railRef,
